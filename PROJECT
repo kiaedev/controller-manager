@@ -1,0 +1,26 @@
+domain: my.domain
+layout:
+- go.kubebuilder.io/v3
+multigroup: true
+projectName: middleware-controller-manager
+repo: my.domain/controller-manager
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: my.domain
+  group: core
+  kind: Application
+  path: my.domain/controller-manager/apis/core/v1beta1
+  version: v1beta1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: my.domain
+  group: middleware
+  kind: MySQL
+  path: my.domain/controller-manager/apis/middleware/v1beta1
+  version: v1beta1
+version: "3"
