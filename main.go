@@ -17,9 +17,12 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -35,7 +38,7 @@ import (
 	middlewarev1beta1 "my.domain/controller-manager/apis/middleware/v1beta1"
 	corecontrollers "my.domain/controller-manager/controllers/core"
 	middlewarecontrollers "my.domain/controller-manager/controllers/middleware"
-	//+kubebuilder:scaffold:imports
+	// +kubebuilder:scaffold:imports
 )
 
 var (
@@ -81,6 +84,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	// "MySQL", "MongoDB", "Redis", "Memcached", "Kafka", "RabbitMQ", "iNotify"
+	clientSet := kubernetes.NewForConfigOrDie(ctrl.GetConfigOrDie())
+	systemSecret := clientSet.CoreV1().Secrets("oae-system")
+	ss, err := systemSecret.Get(context.Background(), "dsns", metav1.GetOptions{})
+
 	if err = (&corecontrollers.ApplicationReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -88,10 +96,11 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Application")
 		os.Exit(1)
 	}
-	if err = (&middlewarecontrollers.MySQLReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
+	if err = middlewarecontrollers.NewMySQLReconciler(clientSet,
+		mgr.GetClient(),
+		mgr.GetScheme(),
+		mgr.GetEventRecorderFor("MySQL"),
+		ss.StringData["mysql"]).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MySQL")
 		os.Exit(1)
 	}

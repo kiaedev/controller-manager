@@ -3,8 +3,10 @@ module my.domain/controller-manager
 go 1.17
 
 require (
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.17.0
+	github.com/saltbo/gopkg v0.0.0-20210820093533-07a5e6511706
 	k8s.io/apimachinery v0.23.0
 	k8s.io/client-go v0.23.0
 	sigs.k8s.io/controller-runtime v0.11.0
