@@ -17,6 +17,9 @@ limitations under the License.
 package v1beta1
 
 import (
+	"fmt"
+	"net"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -28,18 +31,40 @@ type MySQLSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of MySQL. Edit mysql_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	Database         string `json:"database"`
+	Username         string `json:"username,omitempty"`
+	EstimateQPS      int    `json:"estimate_qps,omitempty"`
+	EstimateCapacity int    `json:"estimate_capacity,omitempty"`
 }
 
 // MySQLStatus defines the observed state of MySQL
 type MySQLStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	ConnectionInfo `json:",inline"`
+
+	Phase string `json:"phase"`
+}
+
+type ConnectionInfo struct {
+	Address   string `json:"address"`
+	Database  string `json:"database"`
+	Username  string `json:"username"`
+	PwdSecret string `json:"pwd_secret"`
+}
+
+func (info *ConnectionInfo) BuildDSN(password string) string {
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s", info.Username, password, info.Address, info.Database)
+}
+
+func (info *ConnectionInfo) Host() string {
+	host, _, _ := net.SplitHostPort(info.Address)
+	return host
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.phase`
 
 // MySQL is the Schema for the mysqls API
 type MySQL struct {

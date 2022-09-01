@@ -3,4 +3,5 @@ kind: MySQL
 metadata:
   name: mysql-sample
 spec:
-  # TODO(user): Add fields here
+  database: aaa2
+  username: aaa2_rw
