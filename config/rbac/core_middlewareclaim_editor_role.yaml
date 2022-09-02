@@ -1,0 +1,24 @@
+# permissions for end users to edit middlewareclaims.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: middlewareclaim-editor-role
+rules:
+- apiGroups:
+  - core.my.domain
+  resources:
+  - middlewareclaims
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.my.domain
+  resources:
+  - middlewareclaims/status
+  verbs:
+  - get

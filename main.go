@@ -23,6 +23,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -34,6 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	corev1alpha1 "my.domain/controller-manager/apis/core/v1alpha1"
 	corev1beta1 "my.domain/controller-manager/apis/core/v1beta1"
 	middlewarev1beta1 "my.domain/controller-manager/apis/middleware/v1beta1"
 	corecontrollers "my.domain/controller-manager/controllers/core"
@@ -51,6 +53,7 @@ func init() {
 
 	utilruntime.Must(corev1beta1.AddToScheme(scheme))
 	utilruntime.Must(middlewarev1beta1.AddToScheme(scheme))
+	utilruntime.Must(corev1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -102,6 +105,20 @@ func main() {
 		mgr.GetEventRecorderFor("MySQL"),
 		ss.StringData["mysql"]).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MySQL")
+		os.Exit(1)
+	}
+	if err = (&corecontrollers.MiddlewareReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Middleware")
+		os.Exit(1)
+	}
+	if err = (&corecontrollers.MiddlewareClaimReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "MiddlewareClaim")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

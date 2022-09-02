@@ -23,4 +23,30 @@ resources:
   kind: MySQL
   path: my.domain/controller-manager/apis/middleware/v1beta1
   version: v1beta1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: my.domain
+  group: core
+  kind: Middleware
+  path: my.domain/controller-manager/apis/core/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: my.domain
+  group: core
+  kind: MiddlewareClaim
+  path: my.domain/controller-manager/apis/core/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: my.domain
+  group: core
+  kind: MiddlewarePolicy
+  path: my.domain/controller-manager/apis/core/v1alpha1
+  version: v1alpha1
 version: "3"

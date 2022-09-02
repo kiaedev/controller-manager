@@ -1,0 +1,6 @@
+apiVersion: core.my.domain/v1alpha1
+kind: MiddlewarePolicy
+metadata:
+  name: middlewarepolicy-sample
+spec:
+  # TODO(user): Add fields here

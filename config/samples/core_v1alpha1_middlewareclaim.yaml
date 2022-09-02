@@ -1,0 +1,27 @@
+apiVersion: core.my.domain/v1alpha1
+kind: MiddlewareClaim
+metadata:
+  name: middlewareclaim-sample
+  annotations:
+    middleware.my.domain/estimate/qps: "100"
+spec:
+  mysql:
+    dbname: db1
+    slaveDB: false
+    resources:
+      request:
+        storage: 128Mi
+        connection: 100
+      limit:
+        storage: 1G
+        connection: 1000
+  redis:
+    dbname: 10
+    cluster: false
+    resources:
+      request:
+        memory: 128Mi
+        connection: 5000
+      limit:
+        memory: 1G
+        connection: 10000
